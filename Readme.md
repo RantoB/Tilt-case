@@ -1,16 +1,16 @@
 # Tilt case about electricity breakdown estimation
 
 - Pre-requisites :
-- Have Git install, Python3, Docker
+Git, Python3, Docker
 
 Pull the repository and create a python development environment.
 Go to app directory and install python dependencies with
-```python
+```bash
 pip install -r requirements.txt
 ```
 Than launch the app with
 
-```python
+```bash
 streamlit run app.py
 ```
 

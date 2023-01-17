@@ -59,110 +59,111 @@ with category_L:
     small_lignt = st.checkbox('Small lignt')
     big_light = st.checkbox('Big light')
 
-validation_2 = st.button('Ok', key='ok_2')
+# validation_2 = st.button('Ok', key='ok_2')
 
-if validation_2 and (not fridge and not freezer and not washing_machine and not dishwasher
-        and not induction_stove and not tv and not small_lignt and not big_light):
+if not fridge and not freezer and not washing_machine and not dishwasher \
+        and not induction_stove and not tv and not small_lignt and not big_light:
     st.write('Select at least one appliance.')
     st.stop()
 
-if not validation_2:
-    st.stop()
+# if 'data' not in st.session_state:
+#     if not validation_2:
+#         st.stop()
 
 data = {
-    'fridge': {
-        'presence': fridge,
-        'category': 'F',
-        'power_kW': 2,
-        'min_h': 6,
-        'max_h': 8
-    },
-    'freezer': {
-        'presence': freezer,
-        'category': 'F',
-        'power_kW': 2.5,
-        'min_h': 6,
-        'max_h': 8
-    },
-    'washing_machine': {
-        'presence': washing_machine,
-        'category': 'A',
-        'power_kW': 1.5,
-        'min_h': 1,
-        'max_h': 4
-    },
-    'dishwasher': {
-        'presence': dishwasher,
-        'category': 'A',
-        'power_kW': 2.5,
-        'min_h': 1,
-        'max_h': 4
-    },
-    'induction_stove': {
-        'presence': induction_stove,
-        'category': 'A',
-        'power_kW': 3,
-        'min_h': 1,
-        'max_h': 4
-    },
-    'tv': {
-        'presence': tv,
-        'category': 'L',
-        'power_kW': .5,
-        'min_h': 4,
-        'max_h': 24
-    },
-    'small_light': {
-        'presence': small_lignt,
-        'category': 'L',
-        'power_kW': .1,
-        'min_h': 4,
-        'max_h': 24
-    },
-    'big_light': {
-        'presence': big_light,
-        'category': 'L',
-        'power_kW': .8,
-        'min_h': 4,
-        'max_h': 24
-    },
-}
+        'fridge': {
+            'presence': fridge,
+            'category': 'F',
+            'power_kW': 2,
+            'min_h': 6,
+            'max_h': 8
+        },
+        'freezer': {
+            'presence': freezer,
+            'category': 'F',
+            'power_kW': 2.5,
+            'min_h': 6,
+            'max_h': 8
+        },
+        'washing_machine': {
+            'presence': washing_machine,
+            'category': 'A',
+            'power_kW': 1.5,
+            'min_h': 1,
+            'max_h': 4
+        },
+        'dishwasher': {
+            'presence': dishwasher,
+            'category': 'A',
+            'power_kW': 2.5,
+            'min_h': 1,
+            'max_h': 4
+        },
+        'induction_stove': {
+            'presence': induction_stove,
+            'category': 'A',
+            'power_kW': 3,
+            'min_h': 1,
+            'max_h': 4
+        },
+        'tv': {
+            'presence': tv,
+            'category': 'L',
+            'power_kW': .5,
+            'min_h': 4,
+            'max_h': 24
+        },
+        'small_light': {
+            'presence': small_lignt,
+            'category': 'L',
+            'power_kW': .1,
+            'min_h': 4,
+            'max_h': 24
+        },
+        'big_light': {
+            'presence': big_light,
+            'category': 'L',
+            'power_kW': .8,
+            'min_h': 4,
+            'max_h': 24
+        },
+    }
 
-# st.session_state['data'] = data
+    # st.session_state['data'] = data
 
-if 'consumption_estimation' not in st.session_state:
-    # data = st.session_state['data']
-    df = calcul.build_base_df(data)
+# data = st.session_state['data']
 
-    min_consumption = int(round(df['min_kWh'].sum(), 0))
-    max_consumption = int(round(min(df['max_kWh'].sum(), 75), 0))
-    consumption_avg = int(round((min_consumption + max_consumption) / 2, 0))
+df = calcul.build_base_df(data)
 
-    e_tot = st.number_input(
-        f"Please, enter your measured consumption which is expected to be at least \
-    {min_consumption} kWh and at most {max_consumption} kWh :",
-        min_value=min_consumption,
-        max_value=max_consumption,
-        # value=consumption_avg
-    )
+min_consumption = int(round(df['min_kWh'].sum(), 0))
+max_consumption = int(round(min(df['max_kWh'].sum(), 75), 0))
+consumption_avg = int(round((min_consumption + max_consumption) / 2, 0))
 
-    # validation_3 = st.button('Ok', key='ok_3')
+e_tot = st.number_input(
+    f"Please, enter your measured consumption which is expected to be at least \
+{min_consumption} kWh and at most {max_consumption} kWh :",
+    min_value=min_consumption,
+    max_value=max_consumption,
+    value=consumption_avg
+)
 
-    if not e_tot:
-        st.stop()
+validation_3 = st.button('Ok', key='ok_3')
 
-    df = calcul.estimate(df, float(e_tot))
+if not validation_3:
+    st.stop()
 
-    fig = px.bar(
-        df,
-        x=df.index,
-        y='esti_kWh',
-        labels={
-                 "esti_kWh": "Consumption in kWh",
-                 "index": "Appliances"
-             },
-        title="Electrical consumption per appliance",
-        text_auto='.2f'
-    )
+df = calcul.estimate(df, e_tot)
 
-    st.plotly_chart(fig)
+fig = px.bar(
+    df,
+    x=df.index,
+    y='esti_kWh',
+    labels={
+             "esti_kWh": "Consumption in kWh",
+             "index": "Appliances"
+         },
+    title="Electrical consumption per appliance",
+    text_auto='.2f'
+)
+
+st.plotly_chart(fig)
