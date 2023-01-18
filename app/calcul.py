@@ -23,17 +23,17 @@ def first_estimation(df, e_tot):
     return df
 
 
-def test_esti(df):
+def test_overestimate(df):
     df = df[(df['esti_kWh'] <= df['min_kWh']) & (df['esti_kWh'] != 0)]
     return df.shape[0] == 0
 
 
-def test_esti_2(df):
+def test_underestimate(df):
     df = df[(df['esti_kWh'] >= df['max_kWh']) & (df['esti_kWh'] != 0)]
     return df.shape[0] == 0
 
 
-def estimation_correction_type_1(df, e_tot):
+def overestimation_correction(df, e_tot):
     df_1 = df[df['esti_kWh'] == df['min_kWh']]
 
     df_2 = df[df['esti_kWh'] > df['min_kWh']]
@@ -50,7 +50,7 @@ def estimation_correction_type_1(df, e_tot):
     return df_1, df_2, e_tot_residual
 
 
-def estimation_correction_type_1_bis(df, e_tot):
+def underestimation_correction(df, e_tot):
     df_1 = df[df['esti_kWh'] == df['max_kWh']]
 
     df_2 = df[df['esti_kWh'] < df['max_kWh']]
@@ -85,25 +85,25 @@ def estimation_correction_type_2(df, e_tot):
 def estimate(df, e_tot):
     df = first_estimation(df, e_tot)
 
-    if not test_esti(df):
-        df_1, df_2, e_tot_residual = estimation_correction_type_1(df, e_tot)
+    if not test_overestimate(df):
+        df_1, df_2, e_tot_residual = overestimation_correction(df, e_tot)
 
-        if not test_esti(df_2):
-            df_21, df_22, e_tot_residual = estimation_correction_type_1(df_2, e_tot_residual)
+        if not test_overestimate(df_2):
+            df_21, df_22, e_tot_residual = overestimation_correction(df_2, e_tot_residual)
             df = pd.concat([df_1, df_21, df_22])
         else:
             df = pd.concat([df_1, df_2])
 
-    if not test_esti_2(df):
-        df_1, df_2, e_tot_residual = estimation_correction_type_1_bis(df, e_tot)
+    if not test_underestimate(df):
+        df_1, df_2, e_tot_residual = underestimation_correction(df, e_tot)
 
-        if not test_esti(df_2):
-            df_21, df_22, e_tot_residual = estimation_correction_type_1_bis(df_2, e_tot_residual)
+        if not test_underestimate(df_2):
+            df_21, df_22, e_tot_residual = underestimation_correction(df_2, e_tot_residual)
             df = pd.concat([df_1, df_21, df_22])
         else:
             df = pd.concat([df_1, df_2])
 
-    return estimation_correction_type_2(df, e_tot)
+    return df
 
 
 def print_summary(df, e_tot=None):
